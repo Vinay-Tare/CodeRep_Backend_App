@@ -2,12 +2,18 @@ var express = require("express");
 var User = require("../models/users");
 var passport = require("passport");
 var authenticate = require("../authenticate");
+const cors = require("./cors");
+
 var usersRouter = express.Router();
 usersRouter.use(express.json());
 
 /* GET users listing. */
 
-usersRouter.post("/register", (req, res, next) => {
+usersRouter.options("*", cors.corsWithOptions, (req, res, next) => {
+  return res.sendStatus(200);
+});
+
+usersRouter.post("/register", cors.corsWithOptions, (req, res, next) => {
   User.register(
     new User({
       username: req.body.username,
@@ -35,7 +41,7 @@ usersRouter.post("/register", (req, res, next) => {
   );
 });
 
-usersRouter.post("/login", (req, res, next) => {
+usersRouter.post("/login", cors.corsWithOptions, (req, res, next) => {
   passport.authenticate("local", { session: false }, (err, user, info) => {
     if (err) {
       return next(err);
@@ -73,7 +79,7 @@ usersRouter.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
-usersRouter.get("/checkJWTToken", (req, res, next) => {
+usersRouter.get("/checkJWTToken", cors.corsWithOptions, (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
     if (err) {
       return next(err);
