@@ -43,7 +43,7 @@ exports.verifyUser = (req, res, next) => {
       return res.json({
         success: false,
         status: "Unauthorised",
-        info: info,
+        err: "You are not logged in !",
       });
     }
     req.user = user;

@@ -15,6 +15,7 @@ const ratingSchema = new Schema(
     },
     ratingValue: {
       type: Number,
+      max: 5,
       required: [true, "Rating Value Is Required For Rating"],
     },
   },
