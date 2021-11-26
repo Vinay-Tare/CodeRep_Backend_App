@@ -1,5 +1,5 @@
 var express = require("express");
-var User = require("../models/users");
+var Users = require("../models/users");
 var passport = require("passport");
 var authenticate = require("../authenticate");
 const cors = require("./cors");
@@ -13,9 +13,27 @@ usersRouter.options("*", cors.corsWithOptions, (req, res, next) => {
   return res.sendStatus(200);
 });
 
+usersRouter.get("/", cors.corsWithOptions, (req, res, next) => {
+  Users.find({})
+    .exec()
+    .then(
+      (users) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json({
+          success: true,
+          status: "GET Data Of All Users Successfull",
+          users: users,
+        });
+      },
+      (err) => next(err)
+    )
+    .catch((err) => next(err));
+});
+
 usersRouter.post("/register", cors.corsWithOptions, (req, res, next) => {
-  User.register(
-    new User({
+  Users.register(
+    new Users({
       username: req.body.username,
       fullName: req.body.fullName,
       email: req.body.email,
