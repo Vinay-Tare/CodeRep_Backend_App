@@ -51,9 +51,21 @@ usersRouter.post("/register", cors.corsWithOptions, (req, res, next) => {
         });
       }
       passport.authenticate("local", { session: false })(req, res, () => {
-        res.status = 200;
-        res.setHeader("Content-Type", "application/json");
-        return res.json({ success: true, status: "Registration Successful!" });
+        Users.findOne({ username: req.body.username })
+          .exec()
+          .then(
+            (user) => {
+              res.status = 200;
+              res.setHeader("Content-Type", "application/json");
+              return res.json({
+                success: true,
+                status: "Registration Successful!",
+                user: user,
+              });
+            },
+            (err) => next(err)
+          )
+          .catch((err) => next(err));
       });
     }
   );

@@ -296,17 +296,49 @@ editorsRouter
   .options(cors.corsWithOptions, (req, res) => {
     res.sendStatus(200);
   })
-  .get(cors.cors, (req, res, next) => {
-    res.statusCode = 403;
-    res.setHeader("Content-Type", "application/json");
-    res.json({
-      success: false,
-      status: 403,
-      err:
-        "GET operation not supported on /editors/" +
-        req.params.editorId +
-        "/rating",
-    });
+  .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Editors.findById(req.params.editorId)
+      .exec()
+      .then(
+        (editor) => {
+          if (editor != null) {
+            Ratings.findOne({
+              userId: req.user._id,
+              editorId: req.params.editorId,
+            })
+              .exec()
+              .then(
+                (rating) => {
+                  if (rating) {
+                    res.json({
+                      success: true,
+                      status: "Rating Found!",
+                      rating: rating,
+                    });
+                  } else {
+                    res.json({
+                      success: false,
+                      status: "Rating Not Found!",
+                      err:
+                        "You Have Not Yet Rated The Editor With Id " +
+                        req.params.editorId,
+                    });
+                  }
+                },
+                (err) => next(err)
+              )
+              .catch((err) => next(err));
+          } else {
+            let err = new Error(
+              "Editor With Id " + req.params.editorId + " not found"
+            );
+            err.status = 404;
+            return next(err);
+          }
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
   })
   .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Editors.findById(req.params.editorId)
