@@ -1,4 +1,8 @@
+const dotenv = require('dotenv');
+dotenv.config();
 module.exports = {
-  secretKey: "12345-67890-09876-54321",
-  mongoUrl: "mongodb://localhost:27017/liveCodeEditorDB",
+  allowedOrigins: process.env.ALLOWED_ORIGINS,
+  port: process.env.PORT,
+  secretKey: process.env.SECRET_KEY,
+  mongoUrl: process.env.MONGO_DB_CONNECTION_URL,
 };
